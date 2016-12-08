@@ -1,0 +1,42 @@
+env:
+  browser: true
+  es6: true
+
+extends: 'eslint:recommended'
+
+parser: babel-eslint
+
+parserOptions:
+  ecmaVersion: 7
+  sourceType: module
+  ecmaFeatures:
+    experimentalObjectRestSpread: true
+
+rules:
+  # two spaces with indents for switch/case
+  indent: [1, 2, {"SwitchCase": 1}]
+
+  # don't require strict mode
+  strict: 0
+
+  # allow console.log()
+  no-console: 0
+
+  # allow declarations in switch/case blocks
+  no-case-declarations: 0
+
+  # allow while(true)
+  no-constant-condition: 0
+
+  # unused arguments must be prefixed with an underscore
+  no-unused-vars: [1, {"vars": "all", "varsIgnorePattern": "^_", "argsIgnorePattern": "^_"}]
+
+  # use single-quotes, unless the string has single-quotes inside it
+  # in which case double quotes are ok
+  quotes: [1, "single", "avoid-escape"]
+
+  # always require semi-colons
+  semi: [1, "always"]
+
+  # require unix line-endings
+  linebreak-style: [2, "unix"]

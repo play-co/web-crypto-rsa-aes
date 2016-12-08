@@ -1,0 +1,25 @@
+{
+  "name": "web-crypto-rsa-aes",
+  "author": "Martin Hunt",
+  "version": "0.0.1",
+  "description": "fast rsa+aes using webcrypto with fallback to asmcrypto",
+  "main": "dist/rsaaes",
+  "scripts": {
+    "build-fallback": "[ ! -d lib ] && mkdir lib; [ ! -d asmcrypto ] && git clone https://github.com/vibornoff/asmcrypto.js asmcrypto; cd asmcrypto && npm install && grunt --with rng,sha1,utils,rsa-oaep-sha1-exports,aes-gcm,aes-cbc && mv asmcrypto.js ../lib",
+    "build": "echo 'building rsa+aes library...' && webpack"
+  },
+  "dependencies": {
+    "webcrypto-shim": "^0.1.1"
+  },
+  "devDependencies": {
+    "babel-core": "^6.18.2",
+    "babel-eslint": "^7.1.1",
+    "babel-loader": "^6.2.8",
+    "babel-plugin-transform-runtime": "^6.15.0",
+    "babel-preset-es2015": "^6.18.0",
+    "grunt": "^1.0.1",
+    "eslint": "^3.11.1",
+    "eslint-loader": "^1.6.1",
+    "webpack": "v2.1.0-beta.27"
+  }
+}
