@@ -39,7 +39,10 @@ export function decryptRSAAES(data, rsaKey, rsaBits = 2048, nonceBits = 128) {
 }
 
 export function webCryptoDecryptRSAAES(rsaKey, encryptedKey, nonce, encrypted) {
-  return crypto.decrypt({'name': 'RSA-OAEP'}, rsaKey.webCryptoKey, encryptedKey)
+  return crypto.decrypt({
+    name: 'RSA-OAEP',
+    hash: { name: 'SHA-1' } // required for ie11
+  }, rsaKey.webCryptoKey, encryptedKey)
     .then(sessionKey => crypto.importKey('raw', sessionKey, 'AES-CBC', false, ['decrypt']))
     .then(webKey => {
       return crypto.decrypt({name: 'AES-CBC', iv: nonce}, webKey, encrypted);

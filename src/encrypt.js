@@ -75,7 +75,10 @@ export function encryptRSAAES(data, rsaKey, aesBits=128) {
 export function webCryptoEncryptRSAAES(data, rsaKey, sessionKey, nonce) {
   return Promise.all([
     // rsa-encrypt session key
-    crypto.encrypt({'name': 'RSA-OAEP'}, rsaKey.webCryptoKey, sessionKey),
+    crypto.encrypt({
+      name: 'RSA-OAEP',
+      hash: { name: 'SHA-1' } // required for ie11
+    }, rsaKey.webCryptoKey, sessionKey),
 
     // aes-encrypt data
     crypto.importKey('raw', sessionKey, 'AES-CBC', false, ['encrypt'])

@@ -9,7 +9,7 @@
     "build": "echo 'building rsa+aes library...' && webpack"
   },
   "dependencies": {
-    "webcrypto-shim": "^0.1.1"
+    "webcrypto-shim": "https://github.com/vibornoff/webcrypto-shim#62cc9a7cf69be0e789e637276f7168e2b46a74f6"
   },
   "devDependencies": {
     "babel-core": "^6.18.2",
