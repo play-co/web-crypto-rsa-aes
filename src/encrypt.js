@@ -1,4 +1,4 @@
-import { RSA_OAEP_SHA1, AES_CBC, string_to_bytes } from '../lib/asmcrypto';
+import { RSA_OAEP_SHA1, AES_CBC } from '../lib/asmcrypto';
 
 import concatChunks from './concat';
 
@@ -35,9 +35,36 @@ function isTypedArray(a) {
   return false;
 }
 
+function utf8ToBinaryString(str) {
+  var escstr = encodeURIComponent(str);
+  // replaces any uri escape sequence, such as %0A,
+  // with binary escape, such as 0x0A
+  var binstr = escstr.replace(/%([0-9A-F]{2})/g, function(match, p1) {
+    return String.fromCharCode(parseInt(p1, 16));
+  });
+
+  return binstr;
+}
+
+function binaryStringToBuffer(binstr) {
+  var buf;
+
+  if ('undefined' !== typeof Uint8Array) {
+    buf = new Uint8Array(binstr.length);
+  } else {
+    buf = [];
+  }
+
+  Array.prototype.forEach.call(binstr, function (ch, i) {
+    buf[i] = ch.charCodeAt(0);
+  });
+
+  return buf;
+}
+
 function toArrayBuffer(data) {
   if (typeof data === 'string') {
-    data = string_to_bytes(data);
+    data = binaryStringToBuffer(utf8ToBinaryString(data));
   } else if (data instanceof ArrayBuffer) {
     return data;
   } else if (isTypedArray(data)) {
