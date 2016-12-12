@@ -2,9 +2,11 @@ import { AES_CBC, RSA_OAEP_SHA1 } from '../lib/asmcrypto';
 
 import concatChunks from './concat';
 
+import { crypto, supportsWebcrypto } from './index';
+
 function decryptChunk(chunk, key) {
-  if (crypto) {
-    return crypto.decrypt({'name': 'RSA-OAEP'}, key.webCryptoKey, chunk);
+  if (supportsWebcrypto) {
+    return crypto.subtle.decrypt({'name': 'RSA-OAEP'}, key.webCryptoKey, chunk);
   } else {
     try {
       return Promise.resolve(RSA_OAEP_SHA1.decrypt(chunk, key.asmCryptoKey));
@@ -13,8 +15,6 @@ function decryptChunk(chunk, key) {
     }
   }
 }
-
-const crypto = window.crypto && window.crypto.subtle || null;
 
 export function decryptRSA(message, key) {
   var chunkSize = key.length;
@@ -35,17 +35,17 @@ export function decryptRSAAES(data, rsaKey, rsaBits = 2048, nonceBits = 128) {
   const aesKey = data.slice(0, offset += rsaBits / 8);
   const nonce = data.slice(offset, offset += nonceBits / 8);
   const encrypted = data.slice(offset);
-  return (crypto ? webCryptoDecryptRSAAES : asmCryptoDecryptRSAAES)(rsaKey, aesKey, nonce, encrypted);
+  return (supportsWebcrypto ? webCryptoDecryptRSAAES : asmCryptoDecryptRSAAES)(rsaKey, aesKey, nonce, encrypted);
 }
 
 export function webCryptoDecryptRSAAES(rsaKey, encryptedKey, nonce, encrypted) {
-  return crypto.decrypt({
+  return crypto.subtle.decrypt({
     name: 'RSA-OAEP',
     hash: { name: 'SHA-1' } // required for ie11
   }, rsaKey.webCryptoKey, encryptedKey)
-    .then(sessionKey => crypto.importKey('raw', sessionKey, 'AES-CBC', false, ['decrypt']))
+    .then(sessionKey => crypto.subtle.importKey('raw', sessionKey, 'AES-CBC', false, ['decrypt']))
     .then(webKey => {
-      return crypto.decrypt({name: 'AES-CBC', iv: nonce}, webKey, encrypted);
+      return crypto.subtle.decrypt({name: 'AES-CBC', iv: nonce}, webKey, encrypted);
     }).then(decrypted => {
       return new Uint8Array(decrypted);
     });

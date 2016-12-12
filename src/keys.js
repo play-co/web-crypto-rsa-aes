@@ -1,6 +1,6 @@
 import { base64_to_bytes, SHA1 } from '../lib/asmcrypto';
 
-const crypto = window.crypto && window.crypto.subtle;
+import { crypto, supportsWebcrypto } from './index';
 
 const DEFAULT_ALGORITHM = {
   name: 'RSA-OAEP',
@@ -12,8 +12,8 @@ const DEFAULT_ALGORITHM = {
 export function createRSAKey(jwk, algorithm=DEFAULT_ALGORITHM) {
   return Promise.resolve()
     .then(() => {
-      if (crypto) {
-        return crypto.importKey('jwk', jwk, algorithm, false,
+      if (supportsWebcrypto) {
+        return crypto.subtle.importKey('jwk', jwk, algorithm, false,
           jwk.d && jwk.p
             ? ['decrypt']
             : ['encrypt']);

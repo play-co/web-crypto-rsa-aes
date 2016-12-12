@@ -2,14 +2,11 @@ import { RSA_OAEP_SHA1, AES_CBC, string_to_bytes } from '../lib/asmcrypto';
 
 import concatChunks from './concat';
 
-const crypto = window.crypto && window.crypto.subtle || null;
-
-// this should be polyfilled by asmcrypto either way
-const getRandomValues = window.crypto && window.crypto.getRandomValues.bind(window.crypto);
+import { crypto, supportsWebcrypto } from './index';
 
 function encryptChunk(chunk, key) {
-  if (crypto) {
-    return crypto.encrypt({'name': 'RSA-OAEP'}, key.webCryptoKey, chunk);
+  if (supportsWebcrypto) {
+    return crypto.subtle.encrypt({'name': 'RSA-OAEP'}, key.webCryptoKey, chunk);
   } else {
     try {
       return Promise.resolve(RSA_OAEP_SHA1.encrypt(chunk, key.asmCryptoKey));
@@ -67,22 +64,22 @@ export function encryptRSA(arrayBuffer, key) {
 }
 
 export function encryptRSAAES(data, rsaKey, aesBits=128) {
-  const sessionKey = getRandomValues(new Uint8Array(aesBits / 8));
-  const nonce = getRandomValues(new Uint8Array(aesBits / 8));
-  return (crypto ? webCryptoEncryptRSAAES : asmCryptoEncryptRSAAES)(toArrayBuffer(data), rsaKey, sessionKey, nonce);
+  const sessionKey = crypto.getRandomValues(new Uint8Array(aesBits / 8));
+  const nonce = crypto.getRandomValues(new Uint8Array(aesBits / 8));
+  return (supportsWebcrypto ? webCryptoEncryptRSAAES : asmCryptoEncryptRSAAES)(toArrayBuffer(data), rsaKey, sessionKey, nonce);
 }
 
 export function webCryptoEncryptRSAAES(data, rsaKey, sessionKey, nonce) {
   return Promise.all([
     // rsa-encrypt session key
-    crypto.encrypt({
+    crypto.subtle.encrypt({
       name: 'RSA-OAEP',
       hash: { name: 'SHA-1' } // required for ie11
     }, rsaKey.webCryptoKey, sessionKey),
 
     // aes-encrypt data
-    crypto.importKey('raw', sessionKey, 'AES-CBC', false, ['encrypt'])
-      .then(webKey => crypto.encrypt({'name': 'AES-CBC', iv: nonce}, webKey, data))
+    crypto.subtle.importKey('raw', sessionKey, 'AES-CBC', false, ['encrypt'])
+      .then(webKey => crypto.subtle.encrypt({'name': 'AES-CBC', iv: nonce}, webKey, data))
   ])
     .then(([sessionKey, encrypted]) => {
       return concatChunks([new Uint8Array(sessionKey), nonce, new Uint8Array(encrypted)]);
