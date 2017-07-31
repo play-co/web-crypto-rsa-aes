@@ -1,7 +1,7 @@
 {
   "name": "web-crypto-rsa-aes",
   "author": "Martin Hunt",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "fast rsa+aes using webcrypto with fallback to asmcrypto",
   "main": "dist/rsaaes",
   "scripts": {
@@ -9,7 +9,7 @@
     "build": "echo 'building rsa+aes library...' && webpack"
   },
   "dependencies": {
-    "webcrypto-shim": "https://github.com/vibornoff/webcrypto-shim#62cc9a7cf69be0e789e637276f7168e2b46a74f6"
+    "webcrypto-shim": "https://github.com/vibornoff/webcrypto-shim#702bff6e77f1d7300301848180c37b18b28ec9c7"
   },
   "devDependencies": {
     "babel-core": "^6.18.2",
@@ -17,9 +17,9 @@
     "babel-loader": "^6.2.8",
     "babel-plugin-transform-runtime": "^6.15.0",
     "babel-preset-es2015": "^6.18.0",
-    "grunt": "^1.0.1",
     "eslint": "^3.11.1",
     "eslint-loader": "^1.6.1",
+    "grunt": "^1.0.1",
     "webpack": "v2.1.0-beta.27"
   }
 }
